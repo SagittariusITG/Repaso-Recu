@@ -1,14 +1,38 @@
-public class Gasolinera extends Combustibles {
-    Diesel diesel = new Diesel();
-    SP95 sp95 = new SP95();
-    SP98 sp98 = new SP98();
+import java.text.DecimalFormat;
 
-    private double beneficioGasolinera = 0.21;
+public class Gasolinera {
+  private double beneficioGasolinera;
 
-    public double calcularIVA(double precioBase) { return precioBase / 1.21; }
+  public Gasolinera() {
+    this.beneficioGasolinera = 0.21;
+  }
 
-    public double combustible(double precioBase, double impuesto){ return precioBase + impuesto + calcularIVA(precioBase) + this.beneficioGasolinera; }
+  public double getPrecioConIVA(double precioBase) {
+    return precioBase * 1.21;
+  }
 
-    public double impuestos(double precioBase, double impuesto) { return impuesto + calcularIVA(precioBase); }
-    public double porcenntajeImpuesto(double precioBase, double impuesto) { return impuestos(precioBase, impuesto) / combustible(precioBase, impuesto) * 100; }
+  public double getPrecioPorLitro(Combustible combustible) {
+    return getPrecioConIVA(combustible.getPrecioBase()) + combustible.getImpuestos() + this.beneficioGasolinera;
+  }
+
+  public double impuestos(double precioBase, double impuesto) {
+    return impuesto + getPrecioConIVA(precioBase);
+  }
+
+  public double porcenntajeImpuesto(double precioBase, double impuesto) {
+    return (impuestos(precioBase, impuesto) / (precioBase + impuestos(precioBase, impuesto))) * 100;
+  }
+
+  public void mostrarMensajeCombustible(Combustible combustible) {
+    DecimalFormat decimals = new DecimalFormat("#.###");
+    String mensaje = "Precio/Litro: " + decimals.format(this.getPrecioPorLitro(combustible)) +
+        "\nCantidad destinada a impuestos: "
+        + decimals.format(
+            this.impuestos(combustible.getPrecioBase(), combustible.getImpuestos()) - combustible.getPrecioBase())
+        +
+        "\nEso supone el "
+        + decimals.format(this.porcenntajeImpuesto(combustible.getPrecioBase(), combustible.getImpuestos())) + "%" +
+        "\nGracias por repostar en la Gasolinera Chivata.\n";
+    System.out.println(mensaje);
+  }
 }
